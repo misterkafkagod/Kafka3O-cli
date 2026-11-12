@@ -10,6 +10,7 @@ func NewRootCommand(subcommands ...*cobra.Command) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
+	root.PersistentFlags().StringP("output", "o", "table", "output format: table or json")
 	root.AddCommand(subcommands...)
 	return root
 }
