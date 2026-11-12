@@ -29,6 +29,7 @@ func main() {
 			SessionPath: sessionPath, ReadPassword: terminal.NewReadHiddenPassword(os.Stdin, os.Stderr)}),
 		cli.NewLogoutCommand(loadSession, signOut, func() error { return console.DeleteSession(sessionPath) }),
 		cli.NewWhoamiCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON)),
+		cli.NewClustersCommand(sessionDeps, clusters.NewListClusterHealth(clusters.NewListAccessibleClusters(getJSON), clusters.NewReadClusterHealth(getJSON))),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
