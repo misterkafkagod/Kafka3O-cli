@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/spf13/cobra"
@@ -28,8 +29,22 @@ func NewClustersCommand(deps SessionDependencies, list clusters.ListClusterHealt
 			if err != nil {
 				return err
 			}
+			// Every cluster is printed first; the exit code then says whether any of them could not answer.
+			failed := 0
+			for _, cluster := range health {
+				if cluster.Status != clusters.StatusHealthy {
+					failed++
+				}
+			}
+			result := error(nil)
+			if failed > 0 {
+				result = fmt.Errorf("%d of %d clusters: %w", failed, len(health), ErrClusterFailed)
+			}
 			if format == "json" {
-				return output.WriteJSON(command.OutOrStdout(), health)
+				if err := output.WriteJSON(command.OutOrStdout(), health); err != nil {
+					return err
+				}
+				return result
 			}
 			rows := make([][]string, 0, len(health))
 			for _, cluster := range health {
@@ -43,7 +58,10 @@ func NewClustersCommand(deps SessionDependencies, list clusters.ListClusterHealt
 				rows = append(rows, []string{cluster.ID, cluster.Name, describeEnvironment(cluster.Environment), cluster.EffectiveRole,
 					describeClusterStatus(cluster), brokers, controller})
 			}
-			return output.WriteTable(command.OutOrStdout(), []string{"CLUSTER", "NAME", "ENVIRONMENT", "ROLE", "STATUS", "BROKERS", "CONTROLLER"}, rows)
+			if err := output.WriteTable(command.OutOrStdout(), []string{"CLUSTER", "NAME", "ENVIRONMENT", "ROLE", "STATUS", "BROKERS", "CONTROLLER"}, rows); err != nil {
+				return err
+			}
+			return result
 		},
 	}
 }

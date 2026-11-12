@@ -56,3 +56,23 @@ func TestClustersNotSignedIn(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 }
+
+func TestClustersWithAFailingGateway(t *testing.T) {
+	reads := &fakeConsoleReads{answers: clusterReads, errors: map[string]error{
+		"/api/clusters/kafka-b/gateway/api/v1/cluster": console.Problem{Status: 503, Code: "gateway_unavailable", Title: "The Gateway could not be reached"},
+	}}
+	out, err := runClusters(reads, loaded(signedIn, nil))
+	if ExitCode(err) != ExitClusterFail || err.Error() != "1 of 2 clusters: at least one cluster could not answer" {
+		t.Fatalf("err = %v", err)
+	}
+	if !strings.Contains(out, "kafka-a  Kafka A  Non-production  ADMIN  Healthy") ||
+		!strings.Contains(out, "kafka-b  Kafka B  Production      ADMIN  Gateway unreachable: The Gateway could not be reached") {
+		t.Fatalf("table:\n%s", out)
+	}
+	out, err = runClusters(reads, loaded(signedIn, nil), "-o", "json")
+	var got []clusters.ClusterHealth
+	if ExitCode(err) != ExitClusterFail || json.Unmarshal([]byte(out), &got) != nil || len(got) != 2 || got[1].Status != "gateway_unreachable" ||
+		got[1].Error != "The Gateway could not be reached" || *got[0].Brokers != 1 {
+		t.Fatalf("json: %v\n%s", err, out)
+	}
+}
