@@ -33,7 +33,8 @@ func (r readClusterHealth) Execute(ctx context.Context, session console.Session,
 		return ClusterHealth{}, err
 	}
 	if err != nil {
-		return ClusterHealth{AccessibleCluster: cluster, Status: StatusUnavailable, Error: err.Error()}, nil
+		status, reason := ClassifyClusterError(err)
+		return ClusterHealth{AccessibleCluster: cluster, Status: status, Error: reason}, nil
 	}
 	brokers, controller := len(answer.Brokers), answer.ControllerID
 	return ClusterHealth{AccessibleCluster: cluster, Status: StatusHealthy, ClusterID: answer.ClusterID, ControllerID: &controller, Brokers: &brokers}, nil

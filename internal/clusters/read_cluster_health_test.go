@@ -19,7 +19,7 @@ func TestReadClusterHealth(t *testing.T) {
 func TestReadClusterHealthKeepsFailuresAsStatus(t *testing.T) {
 	failing := &fakeGetJSON{err: console.Problem{Status: 503, Code: "gateway_unavailable", Title: "The Gateway could not be reached"}}
 	health, err := NewReadClusterHealth(failing).Execute(context.Background(), console.Session{}, AccessibleCluster{ID: "kafka-b"})
-	if err != nil || health.Status != StatusUnavailable || health.Error == "" || health.Brokers != nil || health.ID != "kafka-b" {
+	if err != nil || health.Status != StatusGatewayUnreachable || health.Error != "The Gateway could not be reached" || health.Brokers != nil || health.ID != "kafka-b" {
 		t.Fatalf("%+v %v", health, err)
 	}
 	if _, err := NewReadClusterHealth(&fakeGetJSON{err: console.ErrSignedOut}).Execute(context.Background(), console.Session{}, AccessibleCluster{ID: "kafka-a"}); !errors.Is(err, console.ErrSignedOut) {
