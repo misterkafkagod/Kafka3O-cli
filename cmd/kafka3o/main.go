@@ -32,6 +32,7 @@ func main() {
 		cli.NewWhoamiCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON)),
 		cli.NewClustersCommand(sessionDeps, clusters.NewListClusterHealth(clusters.NewListAccessibleClusters(getJSON), clusters.NewReadClusterHealth(getJSON))),
 		cli.NewTopicsCommand(sessionDeps, topics.NewListTopicsAcrossClusters(clusters.NewListAccessibleClusters(getJSON), topics.NewListClusterTopics(getJSON))),
+		cli.NewTopicCommand(sessionDeps, topics.NewDescribeTopic(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
