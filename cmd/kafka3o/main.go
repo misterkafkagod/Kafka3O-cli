@@ -11,6 +11,7 @@ import (
 	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/terminal"
+	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
 )
 
 func main() {
@@ -30,6 +31,7 @@ func main() {
 		cli.NewLogoutCommand(loadSession, signOut, func() error { return console.DeleteSession(sessionPath) }),
 		cli.NewWhoamiCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON)),
 		cli.NewClustersCommand(sessionDeps, clusters.NewListClusterHealth(clusters.NewListAccessibleClusters(getJSON), clusters.NewReadClusterHealth(getJSON))),
+		cli.NewTopicsCommand(sessionDeps, topics.NewListTopicsAcrossClusters(clusters.NewListAccessibleClusters(getJSON), topics.NewListClusterTopics(getJSON))),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
