@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/sessions"
@@ -26,10 +27,13 @@ func runSession(writes *fakeConsoleWrites, stdin string, args ...string) (string
 }
 
 func TestSessionCommand(t *testing.T) {
+	local := time.Local
+	time.Local = time.UTC
+	defer func() { time.Local = local }()
 	writes := &fakeConsoleWrites{answers: map[string]string{"/api/admin/sessions/s2/revoke": `{"operationId":"op","signInRequired":false}`}}
 	out, prompt, err := runSession(writes, "y\n", "s2")
 	if err != nil || out != "Revoked; that session must sign in again.\n" || writes.sent[0].Method != "POST" ||
-		!strings.Contains(prompt, "Revoke the local session of admin created 2026-11-13T21:30:00Z (it must sign in again)") {
+		!strings.Contains(prompt, "Revoke the local session of admin created 2026-11-13 21:30 (it must sign in again)") {
 		t.Fatalf("%v\n%s\n%s", err, out, prompt)
 	}
 }

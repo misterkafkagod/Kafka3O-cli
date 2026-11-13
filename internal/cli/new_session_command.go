@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -47,8 +48,12 @@ func NewSessionCommand(deps SessionAdminDependencies) *cobra.Command {
 			case target.IsCurrent:
 				return errors.New("this is your current session; use kafka3o logout")
 			}
+			created := target.CreatedAt
+			if at, err := time.Parse(time.RFC3339Nano, created); err == nil {
+				created = at.In(time.Local).Format("2006-01-02 15:04")
+			}
 			summary := []string{fmt.Sprintf("Revoke the %s session of %s created %s (it must sign in again)",
-				messages.EscapeTerminalText(target.AuthSource), messages.EscapeTerminalText(target.Username), messages.EscapeTerminalText(target.CreatedAt))}
+				messages.EscapeTerminalText(target.AuthSource), messages.EscapeTerminalText(target.Username), messages.EscapeTerminalText(created))}
 			if err := ConfirmChange(bufio.NewReader(command.InOrStdin()), command.ErrOrStderr(), summary, yes); err != nil {
 				return err
 			}
