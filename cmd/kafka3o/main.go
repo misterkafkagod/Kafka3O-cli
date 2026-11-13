@@ -55,6 +55,8 @@ func main() {
 			Reassign: topics.NewReassignPartition(sendJSON)}),
 		cli.NewReassignmentsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewListReassignments(getJSON)),
 		cli.NewConnectorsCommand(sessionDeps, connect.NewListConnectors(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewConnectorCommand(cli.ConnectorDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+			Run: connect.NewRunConnectorAction(sendJSON)}),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
