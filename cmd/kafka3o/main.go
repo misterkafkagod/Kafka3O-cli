@@ -10,6 +10,7 @@ import (
 	"github.com/misterkafkagod/Kafka3O-cli/internal/cli"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
+	"github.com/misterkafkagod/Kafka3O-cli/internal/messages"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/metrics"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/terminal"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
@@ -37,6 +38,7 @@ func main() {
 		cli.NewBrokersCommand(sessionDeps, clusters.NewListBrokers(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewBrokerConfigCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), clusters.NewReadBrokerConfig(getJSON)),
 		cli.NewMetricsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), metrics.NewReadMetrics(getJSON)),
+		cli.NewMessagesCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewReadMessages(getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
