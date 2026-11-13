@@ -39,6 +39,7 @@ func main() {
 		cli.NewBrokerConfigCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), clusters.NewReadBrokerConfig(getJSON)),
 		cli.NewMetricsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), metrics.NewReadMetrics(getJSON)),
 		cli.NewMessagesCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewReadMessages(getJSON)),
+		cli.NewSearchCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewSearchMessages(getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
