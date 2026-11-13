@@ -19,6 +19,7 @@ import (
 	"github.com/misterkafkagod/Kafka3O-cli/internal/groups"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/messages"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/metrics"
+	"github.com/misterkafkagod/Kafka3O-cli/internal/sessions"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/terminal"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
 )
@@ -80,6 +81,8 @@ func main() {
 		cli.NewEnvironmentsCommand(sessionDeps, environments.NewListRegisteredClusters(getJSON)),
 		cli.NewEnvironmentCommand(cli.EnvironmentDependencies{Session: sessionDeps, List: environments.NewListRegisteredClusters(getJSON),
 			Change: environments.NewChangeClusterEnvironment(sendJSON)}),
+		cli.NewSessionsCommand(sessionDeps, sessions.NewListSessions(getJSON)),
+		cli.NewSessionCommand(cli.SessionAdminDependencies{Session: sessionDeps, List: sessions.NewListSessions(getJSON), Revoke: sessions.NewRevokeSession(sendJSON)}),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
