@@ -59,6 +59,8 @@ func main() {
 		cli.NewConnectorCommand(cli.ConnectorDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Run: connect.NewRunConnectorAction(sendJSON)}),
 		cli.NewBackupsCommand(sessionDeps, backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewBackupCommand(cli.BackupDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+			Start: backups.NewStartBackup(sendJSON), Run: backups.NewRunBackupAction(sendJSON)}),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
