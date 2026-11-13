@@ -17,6 +17,8 @@ type BackupDependencies struct {
 	Accessible clusters.ListAccessibleClusters
 	Start      backups.StartBackup
 	Run        backups.RunBackupAction
+	Restore    backups.StartRestore
+	Wait       backups.WaitForRestore
 }
 
 // runBackupChange pauses, resumes or deletes a topic's backup with the UI's confirmation and result texts.

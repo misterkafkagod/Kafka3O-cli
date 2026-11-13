@@ -31,6 +31,9 @@ func main() {
 	sendJSON := console.NewSendJSON(client)
 	loadSession := func() (console.Session, error) { return console.LoadSession(sessionPath, time.Now) }
 	sessionDeps := cli.SessionDependencies{LoadSession: loadSession, GetJSON: getJSON}
+	backupDeps := cli.BackupDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+		Start: backups.NewStartBackup(sendJSON), Run: backups.NewRunBackupAction(sendJSON), Restore: backups.NewStartRestore(sendJSON),
+		Wait: backups.NewWaitForRestore(backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON), backups.NewSleep(), 5*time.Second)}
 	root := cli.NewRootCommand(
 		cli.NewLoginCommand(cli.LoginDependencies{SignIn: console.NewSignIn(client, signOut), SaveSession: console.SaveSession,
 			SessionPath: sessionPath, ReadPassword: terminal.NewReadHiddenPassword(os.Stdin, os.Stderr)}),
@@ -59,8 +62,8 @@ func main() {
 		cli.NewConnectorCommand(cli.ConnectorDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Run: connect.NewRunConnectorAction(sendJSON)}),
 		cli.NewBackupsCommand(sessionDeps, backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
-		cli.NewBackupCommand(cli.BackupDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
-			Start: backups.NewStartBackup(sendJSON), Run: backups.NewRunBackupAction(sendJSON)}),
+		cli.NewBackupCommand(backupDeps),
+		cli.NewRestoreCommand(backupDeps),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
