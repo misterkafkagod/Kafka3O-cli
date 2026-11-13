@@ -45,6 +45,18 @@ kafka3o reassignments CLUSTER TOPIC                    # moves in progress
 kafka3o reset-offsets CLUSTER GROUP TOPIC --to earliest|latest|TIME   # previews first; the group must be stopped
 ```
 
+Kafka Connect and backups:
+
+```bash
+kafka3o connectors [--cluster ID]                      # connectors and task states, with errors
+kafka3o connector pause|resume|restart CLUSTER NAME
+kafka3o connector restart-task CLUSTER NAME TASK
+kafka3o backups [--cluster ID]                         # state, last write, size, settings, restore progress
+kafka3o backup start CLUSTER TOPIC [--start-from earliest|latest] [--compression gzip|zstd|snappy|none] [--records-per-file N]
+kafka3o backup pause|resume|delete CLUSTER TOPIC       # delete stops the job; stored objects are kept
+kafka3o restore CLUSTER TOPIC [--from TIME] [--to TIME] [--partitions 0,2] [--wait]   # appends to the topic
+```
+
 Every change shows what it will do and asks before sending; `--yes` skips the question. On a Production
 cluster a change reason is required: pass `--reason` or type it when asked (with `--yes` and no reason,
 nothing is sent).
