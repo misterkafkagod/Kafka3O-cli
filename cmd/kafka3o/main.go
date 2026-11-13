@@ -9,6 +9,7 @@ import (
 
 	"github.com/misterkafkagod/Kafka3O-cli/internal/cli"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
+	"github.com/misterkafkagod/Kafka3O-cli/internal/connect"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/groups"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/messages"
@@ -53,6 +54,7 @@ func main() {
 			Describe: topics.NewDescribeTopic(clusters.NewListAccessibleClusters(getJSON), getJSON), Increase: topics.NewIncreasePartitions(sendJSON),
 			Reassign: topics.NewReassignPartition(sendJSON)}),
 		cli.NewReassignmentsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewListReassignments(getJSON)),
+		cli.NewConnectorsCommand(sessionDeps, connect.NewListConnectors(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
