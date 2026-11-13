@@ -57,6 +57,24 @@ kafka3o backup pause|resume|delete CLUSTER TOPIC       # delete stops the job; s
 kafka3o restore CLUSTER TOPIC [--from TIME] [--to TIME] [--partitions 0,2] [--wait]   # appends to the topic
 ```
 
+Administration (audit needs ADMIN on the cluster, or global ADMIN for all clusters; the rest needs a local
+global ADMIN):
+
+```bash
+kafka3o audit [--cluster ID] [--actor A] [--action X] [--outcome O] [--from TIME] [--until TIME] [--limit N] [--after CURSOR]
+kafka3o audit export [same filters] [--file F]         # the Console's CSV; F is created 0600, never overwritten
+kafka3o accounts
+kafka3o account create|reset-password USERNAME [--password-stdin]   # temporary password, asked hidden twice
+kafka3o account enable|disable USERNAME
+kafka3o access                                          # identities, grants, Cognito group mappings
+kafka3o access grant IDENTITY CLUSTER|all VIEWER|OPERATOR|ADMIN|none
+kafka3o access map-group ISSUER GROUP CLUSTER|all VIEWER|OPERATOR|ADMIN|none
+kafka3o environments
+kafka3o environment set CLUSTER production|non-production --reason TEXT
+kafka3o sessions
+kafka3o session revoke ID                               # another session; end your own with logout
+```
+
 Every change shows what it will do and asks before sending; `--yes` skips the question. On a Production
 cluster a change reason is required: pass `--reason` or type it when asked (with `--yes` and no reason,
 nothing is sent).
@@ -64,8 +82,8 @@ nothing is sent).
 Every command takes `-o json` for scripts. Message content is printed with control characters escaped, so a
 message cannot send escape sequences to your terminal. Without `--cluster`, commands read every accessible cluster in parallel.
 
-Exit codes: `0` ok, `1` usage error, not found, refused, denied or canceled, `2` a cluster could not answer
-(the others are still shown), `3` not signed in or sign-in failed, `4` the change may have been applied
+Exit codes: `0` ok, `1` usage error, not found, refused, denied or canceled, `2` a cluster or the Console could not answer
+(other clusters are still shown), `3` not signed in or sign-in failed, `4` the change may have been applied
 (check before retrying).
 
 The session is kept in your user configuration directory (`kafka3o/session.json`, readable only by you) and lasts
