@@ -45,6 +45,8 @@ func main() {
 		cli.NewGroupsCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewGroupCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewProduceCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewProduceMessage(sendJSON)),
+		cli.NewCreateTopicCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewCreateTopic(sendJSON)),
+		cli.NewDeleteTopicCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewDeleteTopic(sendJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
