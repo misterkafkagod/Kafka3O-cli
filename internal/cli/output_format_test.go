@@ -31,3 +31,27 @@ func TestOutputFormat(t *testing.T) {
 		}
 	}
 }
+
+func TestOutputFormatExtraFormats(t *testing.T) {
+	var formats []string
+	var failures []error
+	child := &cobra.Command{Use: "child", RunE: func(command *cobra.Command, _ []string) error {
+		format, err := OutputFormat(command, "csv")
+		formats, failures = append(formats, format), append(failures, err)
+		return nil
+	}}
+	plain := &cobra.Command{Use: "plain", RunE: func(command *cobra.Command, _ []string) error {
+		_, err := OutputFormat(command)
+		failures = append(failures, err)
+		return nil
+	}}
+	for _, args := range [][]string{{"child", "-o", "csv"}, {"plain", "-o", "csv"}} {
+		root := NewRootCommand(child, plain)
+		root.SetOut(&bytes.Buffer{})
+		root.SetArgs(args)
+		_ = root.Execute()
+	}
+	if formats[0] != "csv" || failures[0] != nil || failures[1] == nil || failures[1].Error() != `--output must be table or json, not "csv"` {
+		t.Fatalf("%v %v", formats, failures)
+	}
+}
