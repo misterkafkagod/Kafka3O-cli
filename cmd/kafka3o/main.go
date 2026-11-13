@@ -15,6 +15,7 @@ import (
 	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/connect"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
+	"github.com/misterkafkagod/Kafka3O-cli/internal/environments"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/groups"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/messages"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/metrics"
@@ -76,6 +77,9 @@ func main() {
 			Reset: accounts.NewResetPassword(sendJSON), SetEnabled: accounts.NewSetAccountEnabled(sendJSON)}),
 		cli.NewAccessCommand(cli.AccessDependencies{Session: sessionDeps, List: access.NewListAccess(getJSON),
 			Grant: access.NewChangeRoleGrant(sendJSON), Map: access.NewChangeGroupMapping(sendJSON)}),
+		cli.NewEnvironmentsCommand(sessionDeps, environments.NewListRegisteredClusters(getJSON)),
+		cli.NewEnvironmentCommand(cli.EnvironmentDependencies{Session: sessionDeps, List: environments.NewListRegisteredClusters(getJSON),
+			Change: environments.NewChangeClusterEnvironment(sendJSON)}),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
