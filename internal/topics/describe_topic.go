@@ -36,7 +36,7 @@ func (d describeTopic) Execute(ctx context.Context, session console.Session, clu
 		known = known || candidate.ID == cluster
 	}
 	if !known {
-		return TopicView{}, ErrUnknownCluster{Cluster: cluster}
+		return TopicView{}, clusters.ErrUnknownCluster{Cluster: cluster}
 	}
 	var detail struct {
 		Partitions []TopicPartition `json:"partitions"`

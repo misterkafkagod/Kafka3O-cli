@@ -69,7 +69,7 @@ func TestDescribeTopicFailures(t *testing.T) {
 	if _, err := describe(get).Execute(context.Background(), console.Session{}, "kafka-a", "nope"); !errors.As(err, &notFound) || err.Error() != "topic nope was not found on kafka-a" {
 		t.Errorf("not found: %v", err)
 	}
-	var unknown ErrUnknownCluster
+	var unknown clusters.ErrUnknownCluster
 	if _, err := describe(get).Execute(context.Background(), console.Session{}, "nope", "x"); !errors.As(err, &unknown) {
 		t.Errorf("unknown cluster: %v", err)
 	}

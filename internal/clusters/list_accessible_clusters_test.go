@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
@@ -11,16 +13,27 @@ import (
 
 type fakeGetJSON struct {
 	answers map[string]string
+	errors  map[string]error
 	err     error
+	mu      sync.Mutex
 	paths   []string
 }
 
 func (f *fakeGetJSON) Execute(_ context.Context, _ console.Session, path string, into any) error {
+	f.mu.Lock()
 	f.paths = append(f.paths, path)
+	f.mu.Unlock()
 	if f.err != nil {
 		return f.err
 	}
-	return json.Unmarshal([]byte(f.answers[path]), into)
+	if err := f.errors[path]; err != nil {
+		return err
+	}
+	answer, ok := f.answers[path]
+	if !ok {
+		return fmt.Errorf("unexpected path %s", path)
+	}
+	return json.Unmarshal([]byte(answer), into)
 }
 
 func TestListAccessibleClusters(t *testing.T) {

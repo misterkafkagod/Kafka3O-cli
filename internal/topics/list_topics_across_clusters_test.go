@@ -5,6 +5,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/console"
 )
 
@@ -35,7 +36,7 @@ func TestListTopicsAcrossClustersKeepsAFailingCluster(t *testing.T) {
 		"/api/clusters/kafka-b/gateway/api/v1/topics": console.Problem{Status: 503, Code: "cluster_unreachable", Title: "Cluster unreachable", Detail: "kafka: timeout"},
 	}}
 	topics, failures, err := across(get).Execute(context.Background(), console.Session{}, "")
-	if err != nil || len(topics) != 3 || len(failures) != 1 || failures[0] != (ClusterFailure{Cluster: "kafka-b", Status: "cluster_unreachable", Error: "kafka: timeout"}) {
+	if err != nil || len(topics) != 3 || len(failures) != 1 || failures[0] != (clusters.ClusterFailure{Cluster: "kafka-b", Status: "cluster_unreachable", Error: "kafka: timeout"}) {
 		t.Fatalf("%v %+v %v", names(topics), failures, err)
 	}
 }
@@ -46,7 +47,7 @@ func TestListTopicsAcrossClustersForOneCluster(t *testing.T) {
 	if err != nil || len(topics) != 1 || topics[0].Name != "orders" {
 		t.Fatalf("%v %v", names(topics), err)
 	}
-	var unknown ErrUnknownCluster
+	var unknown clusters.ErrUnknownCluster
 	if _, _, err := across(get).Execute(context.Background(), console.Session{}, "nope"); !errors.As(err, &unknown) || err.Error() != "cluster nope not found or not accessible" {
 		t.Fatalf("unknown: %v", err)
 	}

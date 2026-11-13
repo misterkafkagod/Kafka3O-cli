@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/output"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
 )
@@ -28,7 +29,7 @@ func NewTopicCommand(deps SessionDependencies, describe topics.DescribeTopic) *c
 			view, err := describe.Execute(command.Context(), session, args[0], args[1])
 			var clusterRead topics.ErrClusterRead
 			if errors.As(err, &clusterRead) {
-				return fmt.Errorf("%s: %s: %w", clusterRead.Cluster, describeClusterStatus(clustersHealthOf(topics.ClusterFailure{
+				return fmt.Errorf("%s: %s: %w", clusterRead.Cluster, describeClusterStatus(clustersHealthOf(clusters.ClusterFailure{
 					Cluster: clusterRead.Cluster, Status: clusterRead.Status, Error: clusterRead.Reason})), ErrClusterFailed)
 			}
 			if err != nil {

@@ -6,14 +6,15 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/output"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
 )
 
 // topicList is the JSON shape of `kafka3o topics --output json`.
 type topicList struct {
-	Topics   []topics.Topic          `json:"topics"`
-	Failures []topics.ClusterFailure `json:"failures"`
+	Topics   []topics.Topic            `json:"topics"`
+	Failures []clusters.ClusterFailure `json:"failures"`
 }
 
 // NewTopicsCommand lists topics across every accessible cluster (or one with --cluster), filtered by name.

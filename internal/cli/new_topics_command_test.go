@@ -59,7 +59,7 @@ func TestTopicsFilterInternalAndCluster(t *testing.T) {
 		t.Fatalf("nothing: %q", out)
 	}
 	_, _, err = runTopics(&fakeConsoleReads{answers: topicsReads}, "--cluster", "nope")
-	var unknown topics.ErrUnknownCluster
+	var unknown clusters.ErrUnknownCluster
 	if !errors.As(err, &unknown) || ExitCode(err) != ExitUsage {
 		t.Fatalf("unknown cluster: %v", err)
 	}
