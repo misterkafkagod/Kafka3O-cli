@@ -26,6 +26,7 @@ func main() {
 	}
 	signOut := console.NewSignOut(client)
 	getJSON := console.NewGetJSON(client)
+	sendJSON := console.NewSendJSON(client)
 	loadSession := func() (console.Session, error) { return console.LoadSession(sessionPath, time.Now) }
 	sessionDeps := cli.SessionDependencies{LoadSession: loadSession, GetJSON: getJSON}
 	root := cli.NewRootCommand(
@@ -43,6 +44,7 @@ func main() {
 		cli.NewSearchCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewSearchMessages(getJSON)),
 		cli.NewGroupsCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewGroupCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewProduceCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewProduceMessage(sendJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
