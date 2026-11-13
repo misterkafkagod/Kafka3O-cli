@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"time"
 
 	"github.com/misterkafkagod/Kafka3O-cli/internal/output"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/topics"
@@ -77,32 +76,14 @@ func WriteTopicView(w io.Writer, view topics.TopicView) error {
 		}
 		lines := [][]string{{"State", state}, {"Location", backup.Location}}
 		if backup.Storage != nil {
-			last := "nothing written yet"
-			if backup.Storage.LastWrite != nil {
-				last = backup.Storage.LastWrite.In(time.Local).Format("2006-01-02 15:04:05 MST")
-			}
-			lines = append(lines, []string{"Last write", last}, []string{"Stored", fmt.Sprintf("%d bytes in %d objects", backup.Storage.StoredBytes, backup.Storage.Objects)})
+			lines = append(lines, []string{"Last write", describeLastWrite(backup.Storage.LastWrite)},
+				[]string{"Stored", fmt.Sprintf("%d bytes in %d objects", backup.Storage.StoredBytes, backup.Storage.Objects)})
 		}
-		if settings := backup.Settings; settings != nil {
-			start := map[string]string{"earliest": "from the oldest message", "latest": "messages from when the backup started"}[settings.StartFrom]
-			if start == "" {
-				start = settings.StartFrom
-			}
-			records := "no record limit"
-			if settings.RecordsPerFile > 0 {
-				records = fmt.Sprintf("up to %d records per file", settings.RecordsPerFile)
-			}
-			lines = append(lines, []string{"Settings", start + ", " + settings.Compression + ", " + records})
+		if settings := describeBackupSettings(backup.Settings); settings != "" {
+			lines = append(lines, []string{"Settings", settings})
 		}
-		if restore := backup.Restore; restore != nil {
-			status := fmt.Sprintf("restoring %d of %d records", restore.Restored, restore.Total)
-			switch {
-			case restore.Finished:
-				status = fmt.Sprintf("last restore finished: %d records restored", restore.Total)
-			case restore.Error != "":
-				status = "restore failed: " + restore.Error
-			}
-			lines = append(lines, []string{"Restore", status})
+		if restore := describeBackupRestore(backup.Restore); restore != "" {
+			lines = append(lines, []string{"Restore", restore})
 		}
 		for _, line := range lines {
 			fmt.Fprintf(w, "%-11s %s\n", line[0]+":", line[1])

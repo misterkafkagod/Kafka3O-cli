@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/misterkafkagod/Kafka3O-cli/internal/backups"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/cli"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/clusters"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/connect"
@@ -57,6 +58,7 @@ func main() {
 		cli.NewConnectorsCommand(sessionDeps, connect.NewListConnectors(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewConnectorCommand(cli.ConnectorDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Run: connect.NewRunConnectorAction(sendJSON)}),
+		cli.NewBackupsCommand(sessionDeps, backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
