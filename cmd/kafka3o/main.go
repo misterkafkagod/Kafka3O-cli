@@ -53,6 +53,8 @@ func main() {
 			Describe: topics.NewDescribeTopic(clusters.NewListAccessibleClusters(getJSON), getJSON), Increase: topics.NewIncreasePartitions(sendJSON),
 			Reassign: topics.NewReassignPartition(sendJSON)}),
 		cli.NewReassignmentsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewListReassignments(getJSON)),
+		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
