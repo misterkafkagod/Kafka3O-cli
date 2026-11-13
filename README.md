@@ -31,11 +31,30 @@ kafka3o group CLUSTER GROUP                        # members and offsets per top
 kafka3o logout
 ```
 
+Changes (the same ones the UI makes):
+
+```bash
+kafka3o produce CLUSTER TOPIC --value TEXT [--key TEXT] [--header k=v]...
+kafka3o create-topic CLUSTER TOPIC [--partitions N] [--replication-factor N]
+kafka3o delete-topic CLUSTER TOPIC [--confirm TOPIC]   # asks you to type the topic name
+kafka3o config set CLUSTER topic|broker NAME SETTING VALUE   # put -- before a negative value
+kafka3o config reset CLUSTER topic|broker NAME SETTING
+kafka3o partitions add CLUSTER TOPIC TOTAL             # the new total; partitions cannot be removed
+kafka3o partitions reassign CLUSTER TOPIC PARTITION BROKER,BROKER...
+kafka3o reassignments CLUSTER TOPIC                    # moves in progress
+kafka3o reset-offsets CLUSTER GROUP TOPIC --to earliest|latest|TIME   # previews first; the group must be stopped
+```
+
+Every change shows what it will do and asks before sending; `--yes` skips the question. On a Production
+cluster a change reason is required: pass `--reason` or type it when asked (with `--yes` and no reason,
+nothing is sent).
+
 Every command takes `-o json` for scripts. Message content is printed with control characters escaped, so a
 message cannot send escape sequences to your terminal. Without `--cluster`, commands read every accessible cluster in parallel.
 
-Exit codes: `0` ok, `1` usage error or not found, `2` a cluster could not answer (the others are still shown),
-`3` not signed in or sign-in failed.
+Exit codes: `0` ok, `1` usage error, not found, refused, denied or canceled, `2` a cluster could not answer
+(the others are still shown), `3` not signed in or sign-in failed, `4` the change may have been applied
+(check before retrying).
 
 The session is kept in your user configuration directory (`kafka3o/session.json`, readable only by you) and lasts
 at most 8 hours; `logout` ends it on the Console so no copy of the file works afterwards.
