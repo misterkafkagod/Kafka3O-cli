@@ -49,6 +49,10 @@ func main() {
 		cli.NewDeleteTopicCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewDeleteTopic(sendJSON)),
 		cli.NewConfigCommand(cli.ConfigurationDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Read: clusters.NewReadConfiguration(getJSON), Change: clusters.NewChangeConfiguration(sendJSON)}),
+		cli.NewPartitionsCommand(cli.PartitionDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+			Describe: topics.NewDescribeTopic(clusters.NewListAccessibleClusters(getJSON), getJSON), Increase: topics.NewIncreasePartitions(sendJSON),
+			Reassign: topics.NewReassignPartition(sendJSON)}),
+		cli.NewReassignmentsCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewListReassignments(getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
