@@ -33,6 +33,8 @@ func main() {
 		cli.NewClustersCommand(sessionDeps, clusters.NewListClusterHealth(clusters.NewListAccessibleClusters(getJSON), clusters.NewReadClusterHealth(getJSON))),
 		cli.NewTopicsCommand(sessionDeps, topics.NewListTopicsAcrossClusters(clusters.NewListAccessibleClusters(getJSON), topics.NewListClusterTopics(getJSON))),
 		cli.NewTopicCommand(sessionDeps, topics.NewDescribeTopic(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewBrokersCommand(sessionDeps, clusters.NewListBrokers(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewBrokerConfigCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), clusters.NewReadBrokerConfig(getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
