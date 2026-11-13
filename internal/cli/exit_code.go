@@ -19,8 +19,11 @@ const (
 // ErrClusterFailed marks a result where at least one cluster could not answer; the others were still shown.
 var ErrClusterFailed = errors.New("at least one cluster could not answer")
 
+// ErrServiceUnavailable means the Console itself could not answer an administration request (exit 2).
+var ErrServiceUnavailable = errors.New("the Console could not answer")
+
 // ExitCode maps a command's error to the process exit code: 3 for anything about signing in, 4 when a change may
-// have been applied, 2 when a cluster failed, 1 for everything else (usage errors, not found, denied, canceled).
+// have been applied, 2 when a cluster or the Console could not answer, 1 for everything else (usage errors, not found, denied, canceled).
 func ExitCode(err error) int {
 	switch {
 	case err == nil:
@@ -30,7 +33,7 @@ func ExitCode(err error) int {
 		return ExitNotSignedIn
 	case errors.Is(err, console.ErrOutcomeUnknown):
 		return ExitOutcomeUnknown
-	case errors.Is(err, ErrClusterFailed):
+	case errors.Is(err, ErrClusterFailed), errors.Is(err, ErrServiceUnavailable):
 		return ExitClusterFail
 	default:
 		return ExitUsage
