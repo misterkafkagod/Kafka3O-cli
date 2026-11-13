@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/misterkafkagod/Kafka3O-cli/internal/accounts"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/audit"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/backups"
 	"github.com/misterkafkagod/Kafka3O-cli/internal/cli"
@@ -68,6 +69,10 @@ func main() {
 		cli.NewBackupCommand(backupDeps),
 		cli.NewRestoreCommand(backupDeps),
 		auditCommand,
+		cli.NewAccountsCommand(sessionDeps, accounts.NewListAccounts(getJSON)),
+		cli.NewAccountCommand(cli.AccountDependencies{Session: sessionDeps, ReadPassword: terminal.NewReadHiddenPassword(os.Stdin, os.Stderr),
+			Find: accounts.NewFindAccount(accounts.NewListAccounts(getJSON)), Create: accounts.NewCreateAccount(sendJSON),
+			Reset: accounts.NewResetPassword(sendJSON), SetEnabled: accounts.NewSetAccountEnabled(sendJSON)}),
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
