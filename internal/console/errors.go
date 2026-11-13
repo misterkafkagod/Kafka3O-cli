@@ -11,4 +11,8 @@ var (
 	ErrPasswordChangeRequired = errors.New("password change required: change it in the console first")
 	ErrSignedOut              = errors.New("signed out; run kafka3o login")
 	ErrConsoleUnavailable     = errors.New("the console could not be reached or gave an unexpected answer")
+	// ErrOutcomeUnknown means a change was sent but its result is unknown: it may have been applied.
+	ErrOutcomeUnknown = errors.New("the change may have been applied; check before retrying")
+	// ErrCanceled means the user declined a change, so nothing was sent.
+	ErrCanceled = errors.New("canceled; nothing was sent")
 )

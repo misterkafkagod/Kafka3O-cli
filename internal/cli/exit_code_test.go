@@ -18,6 +18,8 @@ func TestExitCode(t *testing.T) {
 		fmt.Errorf("list clusters: %w", console.ErrSignedOut): ExitNotSignedIn,
 		fmt.Errorf("kafka-b: %w", ErrClusterFailed):           ExitClusterFail,
 		console.ErrConsoleUnavailable:                         ExitUsage,
+		fmt.Errorf("produce: %w", console.ErrOutcomeUnknown):  ExitOutcomeUnknown,
+		console.ErrCanceled:                                   ExitUsage,
 	} {
 		if got := ExitCode(err); got != want {
 			t.Errorf("%v: %d, want %d", err, got, want)
