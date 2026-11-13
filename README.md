@@ -21,10 +21,18 @@ kafka3o whoami                                     # account, session expiry, ro
 kafka3o clusters                                   # every accessible cluster with its health
 kafka3o topics [--cluster ID] [--filter TEXT] [--internal]
 kafka3o topic CLUSTER TOPIC                        # partitions, configuration, consumer groups, backup
+kafka3o brokers [--cluster ID]
+kafka3o broker-config CLUSTER BROKER [--filter TEXT]
+kafka3o metrics CLUSTER [-o json|csv]              # the Metrics tab; json/csv are the UI's downloads
+kafka3o messages CLUSTER TOPIC [--partition N (--offset O | --timestamp T)] [--value text|json|base64]
+kafka3o search CLUSTER TOPIC TEXT                  # the 500 most recent messages, key or value, case-sensitive
+kafka3o groups [--cluster ID] [--filter TEXT]      # with exact total lag
+kafka3o group CLUSTER GROUP                        # members and offsets per topic and partition
 kafka3o logout
 ```
 
-Every command takes `-o json` for scripts. Without `--cluster`, commands read every accessible cluster in parallel.
+Every command takes `-o json` for scripts. Message content is printed with control characters escaped, so a
+message cannot send escape sequences to your terminal. Without `--cluster`, commands read every accessible cluster in parallel.
 
 Exit codes: `0` ok, `1` usage error or not found, `2` a cluster could not answer (the others are still shown),
 `3` not signed in or sign-in failed.
