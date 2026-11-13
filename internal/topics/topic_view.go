@@ -85,11 +85,12 @@ type BackupSettings struct {
 }
 
 type BackupRestore struct {
-	State    string `json:"state"`
-	Restored int64  `json:"restored"`
-	Total    int64  `json:"total"`
-	Finished bool   `json:"finished"`
-	Error    string `json:"error,omitempty"`
+	RestoreID string `json:"restoreId,omitempty"`
+	State     string `json:"state"`
+	Restored  int64  `json:"restored"`
+	Total     int64  `json:"total"`
+	Finished  bool   `json:"finished"`
+	Error     string `json:"error,omitempty"`
 }
 
 // ErrTopicNotFound means the cluster answered that the topic does not exist.
