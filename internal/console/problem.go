@@ -3,6 +3,7 @@ package console
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 // Problem is a Console or Gateway error answer (RFC 9457 problem details with the Kafka3O code).
@@ -11,6 +12,8 @@ type Problem struct {
 	Code   string `json:"code"`
 	Title  string `json:"title"`
 	Detail string `json:"detail"`
+	// OperationID is the Console's correlation id for an administration problem, if any.
+	OperationID string `json:"operationId,omitempty"`
 }
 
 func (p Problem) Error() string {
@@ -21,8 +24,12 @@ func (p Problem) Error() string {
 	if message == "" {
 		message = http.StatusText(p.Status)
 	}
+	reference := strconv.Itoa(p.Status)
 	if p.Code != "" {
-		return fmt.Sprintf("%s (%d %s)", message, p.Status, p.Code)
+		reference += " " + p.Code
 	}
-	return fmt.Sprintf("%s (%d)", message, p.Status)
+	if p.OperationID != "" {
+		reference += ", operation " + p.OperationID
+	}
+	return fmt.Sprintf("%s (%s)", message, reference)
 }

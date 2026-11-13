@@ -12,3 +12,10 @@ func TestProblemError(t *testing.T) {
 		}
 	}
 }
+
+func TestProblemOperationID(t *testing.T) {
+	problem := Problem{Status: 503, Code: "access_change_outcome_unknown", Title: "Access change outcome is unknown; investigate before retrying", OperationID: "op-42"}
+	if problem.Error() != "Access change outcome is unknown; investigate before retrying (503 access_change_outcome_unknown, operation op-42)" {
+		t.Fatal(problem.Error())
+	}
+}
