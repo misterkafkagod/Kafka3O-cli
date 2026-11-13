@@ -42,6 +42,7 @@ func main() {
 		cli.NewMessagesCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewReadMessages(getJSON)),
 		cli.NewSearchCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewSearchMessages(getJSON)),
 		cli.NewGroupsCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
+		cli.NewGroupCommand(sessionDeps, groups.NewListGroups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
