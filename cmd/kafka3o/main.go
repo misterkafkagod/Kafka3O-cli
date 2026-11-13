@@ -47,6 +47,8 @@ func main() {
 		cli.NewProduceCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), messages.NewProduceMessage(sendJSON)),
 		cli.NewCreateTopicCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewCreateTopic(sendJSON)),
 		cli.NewDeleteTopicCommand(sessionDeps, clusters.NewListAccessibleClusters(getJSON), topics.NewDeleteTopic(sendJSON)),
+		cli.NewConfigCommand(cli.ConfigurationDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
+			Read: clusters.NewReadConfiguration(getJSON), Change: clusters.NewChangeConfiguration(sendJSON)}),
 	)
 	err = root.Execute()
 	cli.ForgetEndedSession(sessionPath, err)
