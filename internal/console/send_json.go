@@ -27,7 +27,8 @@ func NewSendJSON(client *http.Client) SendJSON {
 
 // Execute sends the cookies, Origin and the CSRF header like the browser; a non-empty reason travels as
 // X-Kafka3O-Change-Reason, which the Console requires for Production changes and binds into the audited request.
-// 401 means the session is over; the Console's "may have been applied" answers become ErrOutcomeUnknown.
+// 401 means the session is over; every "may have been applied" answer (a code ending in _unknown) becomes
+// ErrOutcomeUnknown.
 func (s sendJSON) Execute(ctx context.Context, session Session, method, path string, body any, reason string, into any) error {
 	base, origin, err := OriginOf(session.ConsoleURL)
 	if err != nil {
@@ -77,8 +78,9 @@ func (s sendJSON) Execute(ctx context.Context, session Session, method, path str
 		var problem Problem
 		_ = json.Unmarshal(answer, &problem)
 		problem.Status = response.StatusCode
-		switch problem.Code {
-		case "gateway_outcome_unknown", "outcome_unknown", "connect_action_unknown":
+		// The Console and the Gateway name every uncertain write "<something>_unknown" (topic_write_unknown,
+		// delivery_unknown, configuration_write_unknown, partition_write_unknown, offset_reset_unknown, …).
+		if strings.HasSuffix(problem.Code, "_unknown") {
 			return fmt.Errorf("%w (%s)", ErrOutcomeUnknown, problem.Error())
 		}
 		return problem

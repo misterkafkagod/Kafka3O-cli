@@ -64,11 +64,9 @@ func TestSendJSONSendsTheWriteHeadersAndBody(t *testing.T) {
 
 func TestSendJSONFailures(t *testing.T) {
 	_, url := newWriteConsole(t, func(w http.ResponseWriter, r *http.Request) {
-		switch {
-		case strings.HasSuffix(r.URL.Path, "/unknown"):
-			problem(w, http.StatusServiceUnavailable, "gateway_outcome_unknown")
-		case strings.HasSuffix(r.URL.Path, "/connect"):
-			problem(w, http.StatusServiceUnavailable, "connect_action_unknown")
+		switch code := strings.TrimPrefix(r.URL.Path, "/"); {
+		case strings.HasSuffix(code, "_unknown"):
+			problem(w, http.StatusServiceUnavailable, code)
 		default:
 			w.Header().Set("Content-Type", "application/problem+json")
 			w.WriteHeader(http.StatusForbidden)
@@ -77,7 +75,8 @@ func TestSendJSONFailures(t *testing.T) {
 	})
 	send := NewSendJSON(http.DefaultClient)
 	session := Session{ConsoleURL: url, Token: "token-1", CSRF: "csrf-1"}
-	for _, path := range []string{"/unknown", "/connect"} {
+	for _, path := range []string{"/gateway_outcome_unknown", "/outcome_unknown", "/connect_action_unknown", "/topic_write_unknown", "/delivery_unknown",
+		"/configuration_write_unknown", "/partition_write_unknown", "/offset_reset_unknown"} {
 		if err := send.Execute(context.Background(), session, "POST", path, nil, "", nil); !errors.Is(err, ErrOutcomeUnknown) {
 			t.Errorf("%s: %v", path, err)
 		}
