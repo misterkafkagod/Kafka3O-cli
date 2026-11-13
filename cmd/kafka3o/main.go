@@ -32,6 +32,8 @@ func main() {
 	sendJSON := console.NewSendJSON(client)
 	loadSession := func() (console.Session, error) { return console.LoadSession(sessionPath, time.Now) }
 	sessionDeps := cli.SessionDependencies{LoadSession: loadSession, GetJSON: getJSON}
+	auditCommand := cli.NewAuditCommand(sessionDeps, audit.NewListAuditEvents(getJSON))
+	auditCommand.AddCommand(cli.NewAuditExportCommand(sessionDeps, audit.NewExportAuditEvents(console.NewGetCSV(client))))
 	backupDeps := cli.BackupDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 		Start: backups.NewStartBackup(sendJSON), Run: backups.NewRunBackupAction(sendJSON), Restore: backups.NewStartRestore(sendJSON),
 		Wait: backups.NewWaitForRestore(backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON), backups.NewSleep(), 5*time.Second)}
@@ -65,7 +67,7 @@ func main() {
 		cli.NewBackupsCommand(sessionDeps, backups.NewListBackups(clusters.NewListAccessibleClusters(getJSON), getJSON)),
 		cli.NewBackupCommand(backupDeps),
 		cli.NewRestoreCommand(backupDeps),
-		cli.NewAuditCommand(sessionDeps, audit.NewListAuditEvents(getJSON)),
+		auditCommand,
 		cli.NewResetOffsetsCommand(cli.ResetDependencies{Session: sessionDeps, Accessible: clusters.NewListAccessibleClusters(getJSON),
 			Preview: groups.NewPreviewOffsetReset(getJSON), Apply: groups.NewApplyOffsetReset(sendJSON)}),
 	)
